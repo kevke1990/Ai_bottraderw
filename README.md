@@ -1,44 +1,52 @@
 # AI BotTrader
 
-AI BotTrader is a modular stock research dashboard. It is designed to monitor a large global equity universe, maintain watchlists, calculate transparent research signals, and send selected stocks to an AI provider for structured analysis.
+AI BotTrader is a standalone-first global equity intelligence dashboard. It can open directly as `public/index.html`, or run as a Node/Docker application for live AI integrations.
+
+## The 16 modules
+1. Global stock universe
+2. Interactive price/chart layer
+3. Technical analysis
+4. Fundamental analysis
+5. News aggregation
+6. Sentiment analysis
+7. AI scoring 0-100
+8. Multi-AI consensus
+9. Watchlists/favorites
+10. Price/AI/news alerts
+11. AI Top Opportunities
+12. Risk scoring and limits
+13. Earnings calendar
+14. Portfolio and paper trading
+15. Backtesting lab
+16. AI research reports with Bull/Bear/Judge reasoning
+
+The UI contains the full workflow. The included seed data is intentionally small; production deployment should connect a licensed market-data provider for the global universe, historical OHLCV, fundamentals, corporate actions, news and filings.
 
 ## AI providers
-The app supports a provider abstraction so you can choose **OpenAI/ChatGPT, Anthropic/Claude, or Google Gemini** without changing the frontend. API keys stay server-side in `.env`.
+OpenAI/ChatGPT, Anthropic/Claude and Google Gemini are supported through one server-side adapter layer. Use `AI_PROVIDER` for one provider or `AI_COUNCIL=openai,anthropic,google` for parallel multi-AI analysis.
 
-## Quick start
+API keys stay server-side. See `docs/AI_PROVIDERS.md`.
 
+## Standalone HTML
+Open `public/index.html` directly in a browser. It works without a server using local demo data, favorites and the UI. Live API calls require the backend.
+
+## Node
 ```bash
 npm install
 cp .env.example .env
-# edit .env and add at least one provider key
+# edit .env
 npm start
 ```
-
 Open `http://localhost:3000`.
 
-## Provider setup
+## Docker / TrueNAS
+```bash
+docker compose up -d --build
+```
+Open port 3000. See `docs/TRUENAS.md`. TrueNAS SCALE supports Custom Apps and Docker Compose YAML for third-party applications.
 
-### OpenAI / ChatGPT
-Set `AI_PROVIDER=openai`, then add `OPENAI_API_KEY`. Set `OPENAI_MODEL` to the model you want to use. The app calls the OpenAI Responses API from the server.
+## Production architecture
+For a real global product, add a database (PostgreSQL), Redis/cache, a licensed market-data/news provider, scheduled ingestion workers, authentication, HTTPS, audit logs and a dedicated backtesting service. Keep AI keys and provider calls on the backend.
 
-### Anthropic / Claude
-Set `AI_PROVIDER=anthropic`, add `ANTHROPIC_API_KEY`, and set `ANTHROPIC_MODEL` to the Claude model available to your account. The server calls Anthropic's Messages API.
-
-### Google Gemini
-Set `AI_PROVIDER=google`, add `GEMINI_API_KEY`, and set `GEMINI_MODEL` to the Gemini model available to your account. The server calls Google's Gemini generateContent API.
-
-Never put any of these keys in `index.html`, client-side JavaScript, GitHub Pages, or a public repository.
-
-## Architecture
-
-- `server.js` — HTTP server, API routes, provider abstraction and AI prompt
-- `public/` — browser application
-- `docs/AI_PROVIDERS.md` — detailed provider setup and security guide
-- `docs/ARCHITECTURE.md` — product architecture and roadmap
-- `data/` — local development data; production should use a database
-
-## Production market data
-The demo includes a small seed universe. To monitor the world's equity markets properly, connect a licensed market-data provider. The provider should supply symbols/exchanges, quotes, corporate actions, fundamentals and (where licensed) news/filings. The market-data interface is intentionally separated from the AI interface.
-
-## Important
-AI scores are research assistance, not financial advice. Do not use the demo data or AI output as an automated trading instruction without independent validation, data-quality checks and risk controls.
+## Safety
+AI output is research assistance, not guaranteed financial advice. Never enable live trading merely because an AI says BUY. Paper trading, position limits, data-quality validation, slippage/fees and independent checks should come first.
