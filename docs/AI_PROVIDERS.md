@@ -1,81 +1,49 @@
 # AI providers koppelen
 
-AI BotTrader gebruikt één backend-interface met drie adapters. Je kiest de actieve provider met `AI_PROVIDER`.
+AI BotTrader ondersteunt OpenAI/ChatGPT, Anthropic/Claude en Google Gemini. De browser kent geen API keys: alle calls lopen via de server.
 
-## 1. OpenAI / ChatGPT
-1. Maak een API key aan in het OpenAI developer platform.
-2. Zet in `.env`:
-
+## OpenAI / ChatGPT
 ```env
 AI_PROVIDER=openai
-OPENAI_API_KEY=plak-hier-je-key
-OPENAI_MODEL=gpt-5.6
+OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-5
 ```
+De server gebruikt de OpenAI Responses API.
 
-3. Herstart `npm start`.
-4. Controleer in de app bij **Instellingen → AI provider** dat OpenAI actief is.
-
-De key wordt uitsluitend server-side gebruikt.
-
-## 2. Anthropic / Claude
-1. Maak een Anthropic API key aan.
-2. Zet:
-
+## Claude / Anthropic
 ```env
 AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=plak-hier-je-key
+ANTHROPIC_API_KEY=...
 ANTHROPIC_MODEL=claude-sonnet-4-5
 ```
+De server gebruikt de Anthropic Messages API.
 
-3. Herstart de server.
-
-## 3. Google Gemini
-1. Maak een Gemini API key aan via Google AI Studio / Gemini API.
-2. Zet:
-
+## Gemini / Google
 ```env
 AI_PROVIDER=google
-GEMINI_API_KEY=plak-hier-je-key
+GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.5-flash
 ```
+De server gebruikt Gemini `generateContent`.
 
-3. Herstart de server.
+## Multi-AI Council
+Voor alle drie tegelijk:
+```env
+AI_COUNCIL=openai,anthropic,google
+```
+De server voert de geconfigureerde providers parallel uit. Providers zonder key geven een fout terug, terwijl beschikbare providers wel resultaten leveren.
 
 ## Provider wisselen
-Je hoeft geen code te wijzigen. Verander alleen `AI_PROVIDER` en herstart:
+Verander `AI_PROVIDER` en herstart de server. Je hoeft de frontend niet te wijzigen.
 
-```env
-AI_PROVIDER=openai
-```
-
-of `anthropic` of `google`.
-
-## API-key veiligheid
+## Beveiliging
+- Zet echte keys alleen in `.env` of TrueNAS secret/environment settings.
 - Commit nooit `.env`.
-- Gebruik `.env.example` alleen als template.
-- Gebruik in productie een secret manager.
-- Zet AI keys nooit in browser JavaScript.
-- Log nooit de volledige API response of API key.
+- Zet keys nooit in HTML, JavaScript of localStorage.
+- Gebruik HTTPS en authenticatie als de app buiten je LAN bereikbaar is.
 
-## Modelkeuze
-Modelnamen veranderen in de tijd. Gebruik daarom de actuele modelnaam die jouw provider/account aanbiedt. De voorbeelden in `.env.example` zijn defaults en kunnen worden aangepast.
+## Modelnamen
+Modelnamen veranderen. Gebruik daarom een modelnaam die op het moment van configuratie door jouw provider/account wordt aangeboden. De waarden in `.env.example` zijn voorbeelden.
 
-## Wat de AI krijgt
-De backend stuurt een gestructureerd onderzoeksobject met ticker, beurs, koers, dagverandering en beschikbare markt/fundamentele context. In de productieversie moet dit worden uitgebreid met historische OHLCV, fundamentals, earnings, nieuws, filings, sectorinformatie en macrodata.
-
-## Aanbevolen AI-output
-De AI wordt gevraagd om JSON terug te geven met:
-- score 0-100
-- classificatie: STRONG_BUY / BUY / HOLD / SELL / STRONG_SELL
-- confidence
-- technical_summary
-- fundamental_summary
-- sentiment_summary
-- catalysts
-- risks
-- valuation_view
-- horizon
-- invalidation_conditions
-- disclaimer
-
-De app toont deze output als onderzoekssamenvatting en niet als gegarandeerde koersvoorspelling.
+## AI research schema
+De backend vraagt om een gestructureerd resultaat met score, signal, confidence, horizon, thesis, bull case, bear case, catalysts, risks en invalidation conditions. In een productieversie moet JSON strikt worden gevalideerd voordat scores in rankings, alerts of paper-tradingregels worden gebruikt.
