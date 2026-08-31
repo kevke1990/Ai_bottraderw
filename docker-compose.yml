@@ -1,0 +1,14 @@
+services:
+  ai-bottrader:
+    build: .
+    container_name: ai-bottrader
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      TZ: Europe/Amsterdam
+      PORT: 3000
+    volumes:
+      - ./data:/app/data
